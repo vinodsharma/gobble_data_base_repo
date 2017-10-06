@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: gobble/python:3.6
+
+    steps:
+
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Configure Docker Image Env Variable
+          command: |
+            echo 'export DOCKER_IMAGE=gobble/pensieve:$CIRCLE_SHA1' >> $BASH_ENV
+
+      - run:
+          name: Building Docker Image
+          command: |
+            docker build -t  $DOCKER_IMAGE .
+
+      - run:
+          name: Running Tests
+          command: |
+            docker run \
+              --env AWS_ACCESS_KEY_ID \
+              --env AWS_SECRET_ACCESS_KEY \
+            -it $DOCKER_IMAGE /bin/bash -c \
+              'source $VENV_DIR/bin/activate; \
+              pytest tests/test_*.py'
