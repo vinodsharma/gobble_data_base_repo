@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Configure Docker Image Env Variable
           command: |
-            echo 'export DOCKER_IMAGE=gobble/pensieve:$CIRCLE_SHA1' >> $BASH_ENV
+            echo 'export DOCKER_IMAGE=gobble/YOUR_APPLICATION_NAME:$CIRCLE_SHA1' >> $BASH_ENV
 
       - run:
           name: Building Docker Image
@@ -26,6 +26,6 @@ jobs:
             docker run \
               --env AWS_ACCESS_KEY_ID \
               --env AWS_SECRET_ACCESS_KEY \
-            -it $DOCKER_IMAGE /bin/bash -c \
+            -t $DOCKER_IMAGE /bin/bash -c \
               'source $VENV_DIR/bin/activate; \
               pytest tests/test_*.py'
