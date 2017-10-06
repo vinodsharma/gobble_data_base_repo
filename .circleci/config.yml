@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: gobble/python:3.6
+      - image: gobble/python:3.6_spark_2.2
 
     steps:
 
