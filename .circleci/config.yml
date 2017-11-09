@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: gobble/python:3.6_spark_2.2
+      - image: gobble/python:3.6
 
     steps:
 
@@ -13,7 +13,8 @@ jobs:
       - run:
           name: Configure Docker Image Env Variable
           command: |
-            echo 'export DOCKER_IMAGE=gobble/your_application_name:$CIRCLE_SHA1' >> $BASH_ENV
+            echo 'export DOCKER_IMAGE=gobble/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1' >> $BASH_ENV
+            echo 'export SHELL_SCRIPT_TO_RUN_APP=run_app.sh' >> $BASH_ENV
 
       - run:
           name: Building Docker Image
@@ -26,6 +27,47 @@ jobs:
             docker run \
               --env AWS_ACCESS_KEY_ID \
               --env AWS_SECRET_ACCESS_KEY \
-            -t $DOCKER_IMAGE /bin/bash -c \
+            -it $DOCKER_IMAGE /bin/bash -c \
               'source $VENV_DIR/bin/activate; \
               pytest tests/test_*.py'
+
+      - run:
+          name: Push Docker Image to Docker Hub
+          command: |
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push $DOCKER_IMAGE
+
+      - run:
+          name: Install pip packages needed for deployment
+          command: |
+            source $VENV_DIR/bin/activate;
+            pip install awscli
+            pip install boto3
+            pip install python-dotenv
+
+
+      - deploy:
+          name: Deploying to staging if tests pass and branch is not master
+          command: |
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+              source $VENV_DIR/bin/activate;
+              export LOGDNA_APP=$CIRCLE_PROJECT_REPONAME'-staging'
+              export BUGSNAG_RELEASE_STAGE=staging
+              export S3_BUCKET=$STAGING_BUCKET
+              aws configure set default.region us-east-1
+              aws configure set default.output json
+              python deploy.py -r $CIRCLE_PROJECT_REPONAME -s $SHELL_SCRIPT_TO_RUN_APP
+            fi
+
+      - deploy:
+          name: Deploying to Prod if tests pass and branch is Master
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              source $VENV_DIR/bin/activate;
+              export LOGDNA_APP=$CIRCLE_PROJECT_REPONAME'-production'
+              export BUGSNAG_RELEASE_STAGE=production
+              export S3_BUCKET=$PRODUCTION_BUCKET
+              aws configure set default.region us-west-2
+              aws configure set default.output json
+              python deploy.py -r $CIRCLE_PROJECT_REPONAME -s $SHELL_SCRIPT_TO_RUN_APP
+            fi
