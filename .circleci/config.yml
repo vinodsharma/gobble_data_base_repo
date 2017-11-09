@@ -53,7 +53,6 @@ jobs:
               source $VENV_DIR/bin/activate;
               export LOGDNA_APP=$CIRCLE_PROJECT_REPONAME'-staging'
               export BUGSNAG_RELEASE_STAGE=staging
-              export S3_BUCKET=$STAGING_BUCKET
               aws configure set default.region us-east-1
               aws configure set default.output json
               python deploy.py -r $CIRCLE_PROJECT_REPONAME -s $SHELL_SCRIPT_TO_RUN_APP
@@ -66,7 +65,6 @@ jobs:
               source $VENV_DIR/bin/activate;
               export LOGDNA_APP=$CIRCLE_PROJECT_REPONAME'-production'
               export BUGSNAG_RELEASE_STAGE=production
-              export S3_BUCKET=$PRODUCTION_BUCKET
               aws configure set default.region us-west-2
               aws configure set default.output json
               python deploy.py -r $CIRCLE_PROJECT_REPONAME -s $SHELL_SCRIPT_TO_RUN_APP
