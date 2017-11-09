@@ -1,5 +1,5 @@
 FROM gobble/spark:2.2
-ENV APP_DIR=/opt/YOUR_GITHUB_REPO_NAME
+ENV APP_DIR=/opt/app
 RUN mkdir $APP_DIR
 COPY . $APP_DIR/
 WORKDIR $APP_DIR
