@@ -13,7 +13,8 @@ jobs:
       - run:
           name: Configure Docker Image Env Variable
           command: |
-            echo 'export DOCKER_IMAGE=gobble/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1' >> $BASH_ENV
+            # echo 'export DOCKER_IMAGE=gobble/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1' >> $BASH_ENV
+            echo 'export DOCKER_IMAGE=vinodsharma/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1' >> $BASH_ENV
             echo 'export SHELL_SCRIPT_TO_RUN_APP=run_app.sh' >> $BASH_ENV
 
       - run:
