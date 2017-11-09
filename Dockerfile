@@ -1,5 +1,5 @@
-FROM gobble/python:3.6_spark_2.2
-ENV APP_DIR=/opt/your_application_name
+FROM gobble/spark:2.2
+ENV APP_DIR=/opt/app
 RUN mkdir $APP_DIR
 COPY . $APP_DIR/
 WORKDIR $APP_DIR

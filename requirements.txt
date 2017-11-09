@@ -1,0 +1,7 @@
+python-dotenv
+awscli
+boto3
+pytest
+pyspark
+logdna
+bugsnag
